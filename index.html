@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Onboarding Setter · Líderes del Fitness</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --orange:#ED6845; --orange-dark:#c9512e; --orange-light:rgba(237,104,69,.10);
+    --petrol:#293138; --petrol-light:rgba(41,49,56,.08);
+    --grafito:#1D1D1B; --gris:#F2F3F7; --gris-mid:#e4e5ea;
+    --border:#e4e5ea; --surface:#fff; --surface2:#fafafb;
+    --radius-sm:8px; --radius-md:12px; --radius-lg:18px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Host Grotesk',sans-serif;background:var(--gris);color:var(--grafito);-webkit-font-smoothing:antialiased;}
+  a{color:var(--orange-dark);}
+  .app{display:flex;min-height:100vh;}
+
+  .sidebar{width:278px;background:var(--petrol);color:#fff;position:fixed;top:0;left:0;bottom:0;overflow-y:auto;padding:1.75rem 1.1rem 2rem;z-index:20;}
+  .sb-logo{display:flex;align-items:center;gap:.6rem;margin-bottom:.3rem;padding:0 .4rem;}
+  .sb-logo img{height:26px;filter:brightness(0) invert(1);}
+  .sb-role{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.55);padding:0 .4rem;margin-bottom:1.6rem;}
+  .sb-role b{color:var(--orange);}
+  .sb-progress{padding:0 .4rem;margin-bottom:1.4rem;}
+  .sb-progress-label{font-size:11.5px;color:rgba(255,255,255,.65);margin-bottom:.4rem;}
+  .sb-progress-bar{height:5px;border-radius:4px;background:rgba(255,255,255,.14);overflow:hidden;}
+  .sb-progress-fill{height:100%;background:var(--orange);border-radius:4px;transition:width .25s;}
+  .sb-group-label{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.4);margin:1.1rem .5rem .5rem;}
+  .step-btn{display:flex;align-items:center;gap:.65rem;width:100%;background:none;border:0;color:rgba(255,255,255,.82);text-align:left;padding:.6rem .5rem;border-radius:var(--radius-sm);cursor:pointer;font-family:inherit;font-size:13.5px;font-weight:500;margin-bottom:.15rem;transition:background .15s;}
+  .step-btn:hover{background:rgba(255,255,255,.06);}
+  .step-btn.active{background:rgba(237,104,69,.18);color:#fff;}
+  .step-num{flex:0 0 22px;height:22px;border-radius:50%;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;}
+  .step-btn.active .step-num{background:var(--orange);color:#fff;}
+
+  .topbar{display:none;position:fixed;top:0;left:0;right:0;height:56px;background:var(--petrol);color:#fff;align-items:center;justify-content:space-between;padding:0 .9rem;z-index:30;}
+  .topbar-title{font-size:13.5px;font-weight:600;}
+  .topbar-title span{display:block;font-size:10.5px;color:rgba(255,255,255,.55);font-weight:400;}
+  .hamburger{width:38px;height:38px;border-radius:9px;background:rgba(255,255,255,.1);border:0;color:#fff;font-size:18px;cursor:pointer;}
+  .drawer-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:35;}
+  .drawer-backdrop.on{display:block;}
+  .drawer{position:fixed;top:0;left:0;bottom:0;width:82%;max-width:320px;background:var(--petrol);z-index:40;transform:translateX(-105%);transition:transform .25s;overflow-y:auto;padding:1.4rem 1rem 2rem;}
+  .drawer.on{transform:translateX(0);}
+
+  .main{margin-left:278px;padding:2.75rem 3.2rem 5rem;max-width:900px;width:100%;}
+  .sec{display:none;}
+  .sec.on{display:block;animation:fadeIn .2s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+  .sec-eyebrow{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--orange-dark);margin-bottom:.5rem;}
+  .sec h1{font-size:26px;margin:0 0 .6rem;font-weight:700;color:var(--grafito);}
+  .sec-lead{font-size:15px;line-height:1.6;color:#4b4f52;margin-bottom:1.8rem;max-width:640px;}
+
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.4rem 1.6rem;margin-bottom:1.1rem;}
+  .card-accent{border-left:4px solid var(--orange);}
+  .card-accent2{border-left:4px solid var(--petrol);}
+  .card h3{margin:0 0 .55rem;font-size:15.5px;font-weight:700;}
+  .card p{margin:0 0 .5rem;font-size:13.8px;line-height:1.6;color:#3d4144;}
+  .card p:last-child{margin-bottom:0;}
+  .card ul,.card ol{margin:.3rem 0 0;padding-left:1.15rem;font-size:13.8px;line-height:1.65;color:#3d4144;}
+  .card ul li,.card ol li{margin-bottom:.3rem;}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.9rem;}
+
+  .kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:1rem 1.1rem;text-align:left;}
+  .kpi b{display:block;font-size:20px;color:var(--orange-dark);margin-bottom:.15rem;}
+  .kpi span{font-size:12px;color:#6a6e71;}
+
+  .term{color:var(--orange-dark);border-bottom:1.5px dotted var(--orange);cursor:pointer;font-weight:600;}
+
+  .tabs-wrap{margin-bottom:1.2rem;}
+  .tabs{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.2rem;}
+  .tab-btn{padding:.5rem 1rem;border-radius:999px;border:1px solid var(--gris-mid);background:#fff;cursor:pointer;font-size:12.8px;font-weight:600;font-family:inherit;color:var(--petrol);}
+  .tab-btn.on{background:var(--orange);border-color:var(--orange);color:#fff;}
+  .tab-pane{display:none;}
+  .tab-pane.on{display:block;}
+
+  .obj{background:var(--surface2);border-radius:var(--radius-md);padding:1rem 1.2rem;margin-bottom:.8rem;border-left:3px solid var(--petrol);}
+  .obj-q{font-weight:700;color:var(--petrol);margin-bottom:.35rem;font-size:13.8px;}
+  .obj-a{font-size:13.5px;line-height:1.6;color:#3d4144;}
+  .obj-a b{color:var(--orange-dark);}
+
+  table.price{width:100%;border-collapse:collapse;font-size:13.5px;margin-bottom:.5rem;}
+  table.price th,table.price td{padding:.6rem .7rem;border-bottom:1px solid var(--border);text-align:left;}
+  table.price th{color:#6a6e71;font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.03em;}
+  table.price td b{color:var(--grafito);}
+  .tag{display:inline-block;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:.2rem .55rem;border-radius:999px;background:var(--orange-light);color:var(--orange-dark);}
+  .tag.petrol{background:var(--petrol-light);color:var(--petrol);}
+
+  .timeline{border-left:2px solid var(--gris-mid);margin-left:.6rem;padding-left:1.4rem;}
+  .tl-item{position:relative;margin-bottom:1.3rem;}
+  .tl-item:last-child{margin-bottom:0;}
+  .tl-item::before{content:'';position:absolute;left:-1.85rem;top:.15rem;width:11px;height:11px;border-radius:50%;background:var(--orange);border:2px solid #fff;box-shadow:0 0 0 2px var(--orange);}
+  .tl-item b{display:block;font-size:14px;margin-bottom:.2rem;}
+  .tl-item span.time{font-size:11.5px;color:var(--orange-dark);font-weight:700;margin-left:.4rem;}
+  .tl-item p{margin:.25rem 0 0;font-size:13.5px;color:#3d4144;line-height:1.6;}
+
+  .btn-link{display:inline-flex;align-items:center;gap:.4rem;background:var(--petrol);color:#fff;text-decoration:none;padding:.6rem 1.1rem;border-radius:var(--radius-sm);font-size:13px;font-weight:600;margin:.3rem .5rem .3rem 0;}
+  .btn-link:hover{background:var(--orange);color:#fff;}
+  .btn-link.alt{background:#fff;color:var(--petrol);border:1px solid var(--border-mid,#d7d9de);}
+
+  .note{background:var(--petrol-light);border:1px solid rgba(41,49,56,.18);border-radius:var(--radius-md);padding:.9rem 1.1rem;font-size:12.8px;color:var(--petrol);line-height:1.6;margin-top:.4rem;}
+  .note b{color:var(--grafito);}
+
+  .check-item{display:flex;gap:.75rem;align-items:flex-start;padding:.7rem 0;border-bottom:1px solid var(--border);cursor:pointer;}
+  .check-item:last-child{border-bottom:0;}
+  .check-box{flex:0 0 20px;height:20px;border-radius:6px;border:1.8px solid var(--gris-mid);margin-top:.1rem;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;}
+  .check-item.done .check-box{background:var(--orange);border-color:var(--orange);}
+  .check-item.done .check-box::after{content:'✓';}
+  .check-item .check-txt{font-size:13.8px;line-height:1.55;color:#3d4144;}
+  .check-item.done .check-txt{color:#9a9d9f;text-decoration:line-through;}
+  .check-week{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--orange-dark);margin:1.3rem 0 .3rem;}
+  .check-week:first-child{margin-top:0;}
+
+  .sec-nav{display:flex;justify-content:space-between;margin-top:2.6rem;gap:.7rem;}
+  .nav-btn{padding:.7rem 1.3rem;border-radius:var(--radius-sm);border:1px solid var(--gris-mid);background:#fff;cursor:pointer;font-weight:600;font-family:inherit;font-size:13.2px;color:var(--petrol);}
+  .nav-btn-next{background:var(--orange);color:#fff;border-color:var(--orange);margin-left:auto;}
+  .nav-btn:disabled{opacity:.35;cursor:default;}
+
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(29,29,27,.55);z-index:100;align-items:center;justify-content:center;padding:1rem;}
+  .modal-overlay.on{display:flex;}
+  .modal-box{display:none;background:#fff;border-radius:var(--radius-lg);max-width:560px;width:100%;max-height:85vh;overflow-y:auto;padding:1.8rem 2rem;position:relative;}
+  .modal-close{position:absolute;top:.9rem;right:1rem;background:var(--gris);border:0;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:14px;}
+  .modal-box h3{margin:0 0 .7rem;font-size:17px;color:var(--orange-dark);}
+  .modal-box p{font-size:13.8px;line-height:1.65;color:#3d4144;margin:0 0 .6rem;}
+
+  @media (max-width:880px){
+    .sidebar{display:none;}
+    .topbar{display:flex;}
+    .main{margin-left:0;padding:4.5rem 1.1rem 4rem;}
+    .grid2,.grid3{grid-template-columns:1fr;}
+    .sec h1{font-size:21px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="sb-logo"><img src="tg-logo.svg" alt="Trainingym"></div>
+    <div class="sb-role">Onboarding · <b>Setter</b></div>
+    <div class="sb-progress">
+      <div class="sb-progress-label" id="progress-label-d">Paso 1 de 14</div>
+      <div class="sb-progress-bar"><div class="sb-progress-fill" id="progress-fill-d" style="width:7%"></div></div>
+    </div>
+
+    <div class="sb-group-label">Producto y cliente</div>
+    <button class="step-btn active" data-step="1" onclick="goTo(1)"><span class="step-num">1</span> Bienvenida y tu rol</button>
+    <button class="step-btn" data-step="2" onclick="goTo(2)"><span class="step-num">2</span> Líderes del Fitness</button>
+    <button class="step-btn" data-step="3" onclick="goTo(3)"><span class="step-num">3</span> Cliente ideal y dolores</button>
+
+    <div class="sb-group-label">La conversación</div>
+    <button class="step-btn" data-step="4" onclick="goTo(4)"><span class="step-num">4</span> Mensajes: redes y WhatsApp</button>
+    <button class="step-btn" data-step="5" onclick="goTo(5)"><span class="step-num">5</span> Cualificación rápida</button>
+    <button class="step-btn" data-step="6" onclick="goTo(6)"><span class="step-num">6</span> Agendar la sesión</button>
+    <button class="step-btn" data-step="7" onclick="goTo(7)"><span class="step-num">7</span> Objeciones al agendar</button>
+    <button class="step-btn" data-step="8" onclick="goTo(8)"><span class="step-num">8</span> Asegurar el show-up</button>
+    <button class="step-btn" data-step="9" onclick="goTo(9)"><span class="step-num">9</span> Traspaso al Closer</button>
+
+    <div class="sb-group-label">Herramientas</div>
+    <button class="step-btn" data-step="10" onclick="goTo(10)"><span class="step-num">10</span> Presentación comercial</button>
+    <button class="step-btn" data-step="11" onclick="goTo(11)"><span class="step-num">11</span> Formación con agente IA</button>
+    <button class="step-btn" data-step="12" onclick="goTo(12)"><span class="step-num">12</span> GoHighLevel</button>
+    <button class="step-btn" data-step="13" onclick="goTo(13)"><span class="step-num">13</span> HubSpot</button>
+
+    <div class="sb-group-label">Arranque</div>
+    <button class="step-btn" data-step="14" onclick="goTo(14)"><span class="step-num">14</span> Checklist</button>
+  </aside>
+
+  <div class="topbar">
+    <button class="hamburger" onclick="toggleDrawer()">☰</button>
+    <div class="topbar-title">Onboarding Setter<span id="progress-label-m">Paso 1 de 14</span></div>
+    <div style="width:38px"></div>
+  </div>
+  <div class="drawer-backdrop" id="drawer-backdrop" onclick="closeDrawer()"></div>
+  <div class="drawer" id="drawer">
+    <div class="sb-logo"><img src="tg-logo.svg" alt="Trainingym"></div>
+    <div class="sb-role">Onboarding · <b>Setter</b></div>
+    <div class="sb-group-label">Producto y cliente</div>
+    <button class="step-btn active" data-step-m="1" onclick="goTo(1)"><span class="step-num">1</span> Bienvenida y tu rol</button>
+    <button class="step-btn" data-step-m="2" onclick="goTo(2)"><span class="step-num">2</span> Líderes del Fitness</button>
+    <button class="step-btn" data-step-m="3" onclick="goTo(3)"><span class="step-num">3</span> Cliente ideal y dolores</button>
+    <div class="sb-group-label">La conversación</div>
+    <button class="step-btn" data-step-m="4" onclick="goTo(4)"><span class="step-num">4</span> Mensajes: redes y WhatsApp</button>
+    <button class="step-btn" data-step-m="5" onclick="goTo(5)"><span class="step-num">5</span> Cualificación rápida</button>
+    <button class="step-btn" data-step-m="6" onclick="goTo(6)"><span class="step-num">6</span> Agendar la sesión</button>
+    <button class="step-btn" data-step-m="7" onclick="goTo(7)"><span class="step-num">7</span> Objeciones al agendar</button>
+    <button class="step-btn" data-step-m="8" onclick="goTo(8)"><span class="step-num">8</span> Asegurar el show-up</button>
+    <button class="step-btn" data-step-m="9" onclick="goTo(9)"><span class="step-num">9</span> Traspaso al Closer</button>
+    <div class="sb-group-label">Herramientas</div>
+    <button class="step-btn" data-step-m="10" onclick="goTo(10)"><span class="step-num">10</span> Presentación comercial</button>
+    <button class="step-btn" data-step-m="11" onclick="goTo(11)"><span class="step-num">11</span> Formación con agente IA</button>
+    <button class="step-btn" data-step-m="12" onclick="goTo(12)"><span class="step-num">12</span> GoHighLevel</button>
+    <button class="step-btn" data-step-m="13" onclick="goTo(13)"><span class="step-num">13</span> HubSpot</button>
+    <div class="sb-group-label">Arranque</div>
+    <button class="step-btn" data-step-m="14" onclick="goTo(14)"><span class="step-num">14</span> Checklist</button>
+  </div>
+
+  <main class="main">
+
+    <!-- SEC 1 -->
+    <section class="sec on" id="sec-1">
+      <div class="sec-eyebrow">Paso 1 · Bienvenida</div>
+      <h1>Bienvenido/a al equipo, Setter 👋</h1>
+      <p class="sec-lead">Esta guía es tu manual de arranque para atender y agendar leads de <b>Líderes del Fitness</b>, el programa de mentoría y consultoría para dueños de gimnasios creado por Rafa Martos (fundador de Trainingym). Tu canal de trabajo es el chat: contestas los mensajes que llegan por redes sociales y por el WhatsApp de la empresa, agendas la sesión de evaluación con un Closer, y te aseguras de que esa cita se llegue a celebrar.</p>
+
+      <div class="card card-accent">
+        <h3>Tu misión como Setter</h3>
+        <p>Respondes los mensajes entrantes en Instagram, Facebook y WhatsApp de empresa, generas interés en la conversación, haces una <span class="term" onclick="openModal('cualificacion')">cualificación rápida</span> y agendas la <b>sesión de evaluación</b> con un Closer — dejando toda la información clave registrada. Tu trabajo no termina al agendar: confirmas y recuerdas la cita hasta que el lead se presenta.</p>
+      </div>
+
+      <div class="grid3">
+        <div class="kpi"><b>&lt; 5 min</b><span>Tiempo objetivo de respuesta a un mensaje entrante (redes o WhatsApp)</span></div>
+        <div class="kpi"><b>≥ 85%</b><span>Show-up rate de las sesiones que agendas</span></div>
+        <div class="kpi"><b>N.º sesiones</b><span>Métrica principal: sesiones de evaluación agendadas y confirmadas por semana</span></div>
+      </div>
+
+      <div class="card" style="margin-top:1rem;">
+        <h3>Cómo usar esta guía</h3>
+        <ul>
+          <li>Sigue los pasos en orden la primera vez; luego úsala como referencia rápida antes de cada conversación.</li>
+          <li>Los términos subrayados en naranja (como <span class="term" onclick="openModal('cualificacion')">este</span>) abren una ficha con la definición.</li>
+          <li>El paso 13 tiene tu checklist de la primera semana.</li>
+        </ul>
+      </div>
+
+      <div class="card" style="margin-top:1rem;">
+        <h3>Organización del trabajo: qué necesitas hacer ya</h3>
+        <p>Antes de empezar a operar, hay tres gestiones que tienes que completar. Sin ellas no puedes acceder a las herramientas del equipo:</p>
+        <ol>
+          <li><b>Firmar tu NDA</b> (acuerdo de confidencialidad) a través de este enlace: <a class="btn-link alt" href="https://eform.pandadoc.com/?eform=c8e73122-af0b-41d1-9913-df22309db082" target="_blank" rel="noopener">↗ Firmar el NDA</a></li>
+          <li><b>Completar tu registro en GoHighLevel y en HubSpot</b> accediendo a la invitación que recibes por correo electrónico — revisa tu bandeja (y spam) los primeros días. Ver pasos 12 y 13 para el manejo de cada plataforma.</li>
+          <li><b>Unirte al canal de Slack #lideresdelfitness</b>, el espacio común de todo el equipo (Closers, Setters, managers) para dudas, anuncios y coordinación del día a día.</li>
+        </ol>
+        <div class="note" style="margin-top:.6rem;">Si algo de esto no ha llegado a tu correo o no puedes acceder, avisa a tu manager cuanto antes — no bloquees tu primera semana por esto.</div>
+      </div>
+
+      <div class="sec-nav"><span></span><button class="nav-btn nav-btn-next" onclick="goTo(2)">Siguiente: El producto →</button></div>
+    </section>
+
+    <!-- SEC 2 -->
+    <section class="sec" id="sec-2">
+      <div class="sec-eyebrow">Paso 2 · Producto</div>
+      <h1>Qué es Líderes del Fitness</h1>
+      <p class="sec-lead">No necesitas venderlo a fondo — eso lo hace el Closer en la sesión de evaluación — pero sí debes poder explicarlo con seguridad en los primeros mensajes de la conversación para generar interés real.</p>
+
+      <div class="card card-accent">
+        <h3>La propuesta en una frase</h3>
+        <p>Líderes del Fitness transforma gimnasios que se gestionan "a intuición" en negocios <b>estructurados, rentables y escalables</b>, a través de mentoría directa de Rafa Martos y su equipo, más consultoría en 4 áreas clave del negocio.</p>
+      </div>
+
+      <div class="card">
+        <h3>Los 4 pilares del programa</h3>
+        <div class="grid2">
+          <div><b>Empresarial</b><p style="margin:.2rem 0 0;">Modelo de negocio, finanzas y estructura.</p></div>
+          <div><b>Marketing y comunicación</b><p style="margin:.2rem 0 0;">Rediseño de la estrategia de captación.</p></div>
+          <div><b>Comercial y ventas</b><p style="margin:.2rem 0 0;">Optimización del proceso de cierre del gimnasio.</p></div>
+          <div><b>Operaciones</b><p style="margin:.2rem 0 0;">Procesos y experiencia de cliente.</p></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Los dos programas (para situar al lead, no para venderlos)</h3>
+        <table class="price">
+          <tr><th></th><th>Accelerator</th><th>Mastermind</th></tr>
+          <tr><td>Claim</td><td>Para crecer con velocidad</td><td>Para escalar sin límites</td></tr>
+          <tr><td>Duración</td><td><b>4 meses</b></td><td><b>4 meses</b></td></tr>
+          <tr><td>Personas incluidas</td><td>2</td><td>5</td></tr>
+          <tr><td>Precio (Live Show)</td><td><s>$4.500</s> → <b>$3.000</b></td><td><s>$12.000</s> → <b>$9.000</b></td></tr>
+          <tr><td>Forma de pago</td><td colspan="2">Pronto pago o mes a mes</td></tr>
+        </table>
+        <div class="note"><b>Importante:</b> el nombre oficial del programa de entrada es <b>"Accelerator"</b> (no "Aceleradora"). Como Setter <u>no cierras precio ni presentas la oferta en detalle</u> — eso corresponde al Closer en la sesión de evaluación. Si preguntan por precio en el chat, puedes dar el orden de magnitud y mencionar que hay opción de pago mensual, pero redirige el detalle: "eso lo vemos justo en la sesión con [Closer], ahí te lo adapta a tu caso — y sí, se puede pagar de una vez o mes a mes".</div>
+      </div>
+
+      <div class="card">
+        <h3>Resultados que promete el programa (úsalos para generar interés)</h3>
+        <ul>
+          <li>Aumentar márgenes entre un <b>20% y 50% en 3 meses</b>.</li>
+          <li>Incrementar la facturación hasta un <b>30%</b>.</li>
+          <li>Liberar <b>más del 40%</b> del tiempo operativo del dueño.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Prueba social</h3>
+        <p>Más de <b>100 líderes del sector fitness</b> ya han pasado por el programa (Sports World, Qivox, Power Fit Gym, entre otros). Cifra ancla: <b>+7M$ en ingresos generados</b> para los negocios participantes.</p>
+        <a class="btn-link" href="https://lideresdelfitness.com/" target="_blank" rel="noopener">↗ Ver web del producto</a>
+        <a class="btn-link alt" href="https://mirkotrain.github.io/Presentaci-n-Lideres-del-Fitness/" target="_blank" rel="noopener">↗ Ver presentación comercial</a>
+      </div>
+
+      <div class="sec-nav"><button class="nav-btn" onclick="goTo(1)">← Anterior</button><button class="nav-btn nav-btn-next" onclick="goTo(3)">Siguiente: Cliente ideal →</button></div>
+    </section>
+
+    <!-- SEC 3 -->
+    <section class="sec" id="sec-3">
+      <div class="sec-eyebrow">Paso 3 · Cliente</div>
+      <h1>El cliente ideal y sus dolores</h1>
+      <p class="sec-lead">Tu primer mensaje tiene que "enganchar" mencionando un dolor real, no una característica del programa. Reconocer estos dolores rápido es lo que te permite cualificar bien en la conversación.</p>
+
+      <div class="card card-accent2">
+        <h3>Perfil (ICP)</h3>
+        <p>Propietarios y directivos de centros fitness de cualquier tamaño: desde el entrenador que monta su primer negocio hasta cadenas con varios centros. Denominador común: el negocio ha crecido más rápido que sus sistemas de gestión.</p>
+      </div>
+
+      <div class="grid2">
+        <div class="card"><h3>Captación ineficiente</h3><p>Coste de adquisición de cliente muy alto — se cita hasta un <b>80% del coste sobre la cuota</b> del cliente en negocios sin sistema.</p></div>
+        <div class="card"><h3>LTV bajo</h3><p>Los clientes se dan de baja pronto porque no hay una experiencia y fidelización estructurada.</p></div>
+        <div class="card"><h3>Sobrecarga operativa</h3><p>El dueño "hace de todo": recepción, ventas, marketing, incidencias. No hay margen para pensar en crecer.</p></div>
+        <div class="card"><h3>Falta de sistemas</h3><p>Decisiones a intuición, sin procesos documentados ni indicadores para tomar decisiones.</p></div>
+        <div class="card"><h3>Dificultad para delegar</h3><p>No hay equipo ni liderazgo estructurado — todo depende de una persona.</p></div>
+        <div class="card"><h3>Techo financiero</h3><p>Sin rentabilidad ni orden financiero es imposible invertir para escalar o atraer inversión.</p></div>
+      </div>
+
+      <div class="card" style="margin-top:1rem;">
+        <h3>La objeción de fondo (anticípala tú primero)</h3>
+        <div class="obj">
+          <div class="obj-q">"Yo no tengo experiencia en gestión, vengo del mundo del entrenamiento"</div>
+          <div class="obj-a"><b>Reframe:</b> ese es exactamente el perfil para el que se diseñó el programa. No es teoría — es acompañamiento real, probado en +100 gimnasios que empezaron en el mismo punto.</div>
+        </div>
+      </div>
+
+      <div class="sec-nav"><button class="nav-btn" onclick="goTo(2)">← Anterior</button><button class="nav-btn nav-btn-next" onclick="goTo(4)">Siguiente: Mensajes: redes y WhatsApp →</button></div>
+    </section>
+
+    <!-- SEC 4 -->
+    <section class="sec" id="sec-4">
+      <div class="sec-eyebrow">Paso 4 · La conversación</div>
+      <h1>Mensajes entrantes: redes sociales y WhatsApp</h1>
+      <p class="sec-lead">Este es tu canal principal de trabajo: los leads te escriben, no te llaman. Todo pasa por texto — Instagram, Facebook y el WhatsApp de la empresa — y tu prioridad es responder rápido y bien, sin sonar a bot.</p>
+
+      <div class="grid2">
+        <div class="card"><h3>Instagram y Facebook (redes)</h3><p>Mensajes directos o comentarios que responden a un anuncio, un story o contenido orgánico. El lead suele venir "en caliente" pero con poco contexto — tu apertura debe conectar con lo que vio.</p></div>
+        <div class="card"><h3>WhatsApp de empresa</h3><p>Número corporativo compartido en la web, anuncios y presentaciones. Puede ser un lead nuevo o alguien que retoma una conversación — revisa siempre el histórico antes de responder.</p></div>
+      </div>
+
+      <div class="card card-accent">
+        <h3>Script de apertura (redes sociales)</h3>
+        <p>"¡Hola [nombre]! Soy [tu nombre], del equipo de Líderes del Fitness 👋 vi que [interactuaste con nuestro anuncio / story sobre X] — cuéntame, ¿en qué punto está tu gimnasio ahora mismo con [captación / gestión del equipo / rentabilidad]?"</p>
+      </div>
+
+      <div class="card card-accent2">
+        <h3>Script de apertura (WhatsApp)</h3>
+        <p>"Hola [nombre], soy [tu nombre] de Líderes del Fitness. Me han pasado tu contacto porque [motivo: formulario, anuncio, presentación] — antes de nada, ¿me cuentas un poco cómo va tu gimnasio ahora mismo?"</p>
+      </div>
+
+      <div class="card">
+        <h3>Buenas prácticas de mensajería</h3>
+        <ul>
+          <li>Mensajes cortos (2-3 líneas como máximo) — nadie lee un muro de texto en el móvil.</li>
+          <li>Una pregunta por mensaje, no varias a la vez.</li>
+          <li>Tono cercano y humano: evita sonar a respuesta automática o a copia-pega genérico.</li>
+          <li>Si tarda en responder, un único recordatorio suave a las 24h — no satures con varios mensajes seguidos.</li>
+          <li>No menciones precio ni detalles del programa por chat — tu objetivo aquí es interés y cita, no venta.</li>
+        </ul>
+      </div>
+
+      <div class="note"><b>Nota:</b> tanto Instagram/Facebook como el WhatsApp de empresa llegan a la misma bandeja de <span class="term" onclick="openModal('crm')">Conversaciones</span> en GoHighLevel — no necesitas herramientas distintas para cada canal. Ver paso 11.</div>
+
+      <div class="sec-nav"><button class="nav-btn" onclick="goTo(3)">← Anterior</button><button class="nav-btn nav-btn-next" onclick="goTo(5)">Siguiente: Cualificación rápida →</button></div>
+    </section>
+
+    <!-- SEC 5 -->
+    <section class="sec" id="sec-5">
+      <div class="sec-eyebrow">Paso 5 · La conversación</div>
+      <h1>Cualificación rápida</h1>
+      <p class="sec-lead">No es un discovery completo (eso lo hace el Closer) — es un filtro de 3-5 minutos, dentro de la propia conversación de chat, para confirmar que vale la pena agendar la sesión de evaluación, y para dejarle al Closer contexto útil.</p>
+
+      <div class="grid2">
+        <div class="card card-accent"><h3>Interés</h3><p>"¿Qué te hizo darle importancia a esto ahora?"</p></div>
+        <div class="card card-accent"><h3>Urgencia</h3><p>"¿Hay algo pasando en el negocio que haga que quieras resolver esto pronto?"</p></div>
+        <div class="card card-accent2"><h3>Decisor</h3><p>"¿Eres tú quien decide este tipo de cosas en el negocio, o hay alguien más que debería estar en la sesión?"</p></div>
+        <div class="card card-accent2"><h3>Encaje básico</h3><p>"¿Tienes ya un gimnasio en marcha o estás en fase de montarlo?" (el programa está pensado para negocios ya operando)</p></div>
+      </div>
+
+      <div class="card">
+        <h3>Red flags — cuándo NO agendar (o agendar con reserva)</h3>
+        <ul>
+          <li>No tiene ni tendrá capacidad de decisión ni de inversión en los próximos meses.</li>
+          <li>No tiene aún un centro en funcionamiento (el programa no está pensado para pre-lanzamiento).</li>
+          <li>Solo busca información gratuita sin intención real de resolver el problema (lo notarás en evasivas repetidas).</li>
+        </ul>
+      </div>
+
+      <div class="note">Todo lo que recojas aquí (interés, urgencia, quién decide, dolor principal) va directo a la ficha del contacto en el CRM — es lo primero que el Closer lee antes de la llamada. Ver <span class="term" onclick="openModal('crm')">paso 12-13</span>.</div>
+
+      <div class="sec-nav"><button class="nav-btn" onclick="goTo(4)">← Anterior</button><button class="nav-btn nav-btn-next" onclick="goTo(6)">Siguiente: Agendar la sesión →</button></div>
+    </section>
+
+    <!-- SEC 6 -->
+    <section class="sec" id="sec-6">
+      <div class="sec-eyebrow">Paso 6 · La conversación</div>
+      <h1>Agendar la sesión de evaluación</h1>
+      <p class="sec-lead">Tu objetivo final no es "convencer del programa" — es conseguir un hueco en el calendario, confirmado y con el mayor compromiso posible para que se presente.</p>
+
+      <div class="card card-accent">
+        <h3>Cómo presentar la sesión (por chat)</h3>
+        <p>"Lo que te propongo es una <span class="term" onclick="openModal('sesion')">sesión de evaluación</span> de 45 minutos con [Closer], donde vais a revisar tu negocio en detalle y te va a dejar claro un plan concreto para [dolor mencionado] — tanto si al final trabajamos juntos como si no, sales con claridad. ¿Qué día de esta semana te viene mejor, martes o jueves?"</p>
+      </div>
+
+      <div class="card">
+        <h3>Aumentar el compromiso (reduce no-shows)</h3>
+        <ul>
+          <li>Cierra día Y hora concretos, nunca "ya te aviso".</li>
+          <li>Explica qué debe preparar (acceso a cifras básicas del negocio, por ejemplo).</li>
+          <li>Confirma el medio (videollamada) y envía el enlace al momento, en el mismo chat.</li>
+        </ul>
+      </div>
+
+      <div class="note">Agendar bien es solo la mitad del trabajo — la secuencia de recordatorios que evita que no se presente está en el <span class="term" onclick="openModal('showup')">paso 8</span>.</div>
+
+      <div class="sec-nav"><button class="nav-btn" onclick="goTo(5)">← Anterior</button><button class="nav-btn nav-btn-next" onclick="goTo(7)">Siguiente: Objeciones al agendar →</button></div>
+    </section>
+
+    <!-- SEC 7 -->
+    <section class="sec" id="sec-7">
+      <div class="sec-eyebrow">Paso 7 · La conversación</div>
+      <h1>Objeciones al agendar</h1>
+      <p class="sec-lead">Aquí no gestionas objeciones de precio (eso es del Closer) — gestionas objeciones, por chat, para conseguir la cita.</p>
+
+      <div class="obj"><div class="obj-q">"No tengo tiempo ahora mismo"</div><div class="obj-a"><b>Reframe:</b> "Lo entiendo, por eso la sesión son solo 45 minutos y se adapta a tu agenda — ¿qué franja te resulta menos mala esta semana, mañana temprano o al final del día?"</div></div>
+      <div class="obj"><div class="obj-q">"Mándame información y ya te digo"</div><div class="obj-a"><b>Reframe:</b> "Sin problema, te paso [presentación/ficha] ahora mismo — y para no perder el hilo, ¿reservamos ya un hueco tentativo que puedas cancelar si al final no encaja?"</div></div>
+      <div class="obj"><div class="obj-q">"¿Cuánto cuesta esto?"</div><div class="obj-a"><b>Reframe:</b> "Depende del programa que mejor encaje contigo, y eso es justo lo que se ve en la sesión con [Closer] — ahí te lo adapta a tu caso concreto, no es un precio único para todos. Y se puede pagar de una vez o mes a mes, así que no te preocupes por eso ahora."</div></div>
+      <div class="obj"><div class="obj-q">"No sé si esto es para mí"</div><div class="obj-a"><b>Reframe:</b> vuelve al dolor detectado en la cualificación: "Me decías que [dolor concreto] — la sesión sirve precisamente para ver si esto tiene sentido para tu caso, sin compromiso."</div></div>
+
+      <div class="sec-nav"><button class="nav-btn" onclick="goTo(6)">← Anterior</button><button class="nav-btn nav-btn-next" onclick="goTo(8)">Siguiente: Asegurar el show-up →</button></div>
+    </section>
+
+    <!-- SEC 8 -->
+    <section class="sec" id="sec-8">
+      <div class="sec-eyebrow">Paso 8 · La conversación</div>
+      <h1>Asegurar que la reunión se realice</h1>
+      <p class="sec-lead">Agendar no es suficiente: tu trabajo sigue hasta que el lead entra a la videollamada. La secuencia de confirmación es la que marca la diferencia entre un buen show-up rate y una agenda llena de huecos.</p>
+
+      <div class="card card-accent">
+        <h3>Secuencia de recordatorios</h3>
+        <div class="timeline">
+          <div class="tl-item"><b>Al agendar</b><p>Confirmación inmediata por el mismo canal (WhatsApp o red social), con día, hora y el enlace a la videollamada.</p></div>
+          <div class="tl-item"><b>24h antes</b><p>Recordatorio con un resumen de qué van a ver en la sesión y qué le conviene tener a mano (cifras básicas del negocio).</p></div>
+          <div class="tl-item"><b>1-2h antes</b><p>Mensaje corto y directo: "Nos vemos en un rato, aquí tienes el enlace 👉 [link]". Pide confirmación explícita: "¿Todo listo para la sesión de las X?".</p></div>
+          <div class="tl-item"><b>Si no confirma</b><p>Escríbele o llámale de nuevo antes de la hora — un lead que no responde al recordatorio de 1-2h tiene alto riesgo de no-show.</p></div>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div class="card"><h3>Señales de riesgo de no-show</h3><ul><li>No confirma ninguno de los recordatorios.</li><li>Agendó "para quitarse de encima" durante una objeción, sin compromiso real.</li><li>Cambia de fecha más de una vez.</li></ul></div>
+        <div class="card"><h3>Si no se presenta</h3><ul><li>Escríbele en los 15 minutos siguientes ofreciendo reagendar.</li><li>Registra el no-show en el CRM con el motivo si lo da.</li><li>No dejes pasar más de 24h sin intentar recuperar la cita.</li></ul></div>
+      </div>
+
+      <div class="note">El show-up rate es tu métrica más visible de cara al equipo — una sesión mal confirmada es tiempo perdido del Closer, no solo tuyo.</div>
+
+      <div class="sec-nav"><button class="nav-btn" onclick="goTo(7)">← Anterior</button><button class="nav-btn nav-btn-next" onclick="goTo(9)">Siguiente: Traspaso al Closer →</button></div>
+    </section>
+
+    <!-- SEC 9 -->
+    <section class="sec" id="sec-9">
+      <div class="sec-eyebrow">Paso 9 · La conversación</div>
+      <h1>Traspaso al Closer</h1>
+      <p class="sec-lead">Un buen traspaso es la diferencia entre una sesión que empieza fluida y una que empieza repitiendo preguntas ya respondidas. El Closer debe poder leer la ficha y llegar preparado.</p>
+
+      <div class="card card-accent">
+        <h3>Qué debe incluir siempre el traspaso</h3>
+        <ul>
+          <li>Nombre, negocio y canal de origen del lead (Instagram, Facebook, WhatsApp — y campaña si aplica).</li>
+          <li>Dolor principal detectado y sus propias palabras (cita textual si puedes).</li>
+          <li>Respuestas a Interés / Urgencia / Decisor de la cualificación rápida.</li>
+          <li>Cualquier objeción ya trabajada al agendar.</li>
+          <li>Fecha y hora confirmadas de la sesión + qué recordatorios se han enviado y confirmado (paso 8).</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Dónde se registra</h3>
+        <p>Todo esto va en la ficha del contacto en <span class="term" onclick="openModal('crm')">GoHighLevel y HubSpot</span> (ver pasos 12 y 13) antes de que termine tu jornada — nunca dejes un traspaso "de memoria" o solo por chat interno.</p>
+      </div>
+
+      <div class="card">
+        <h3>Si no se consigue agendar</h3>
+        <p>Registra igualmente el contacto y el motivo (frío, no decisor, sin negocio activo, etc.) para que quede en el histórico y pueda retomarse más adelante en una campaña de nurturing.</p>
+      </div>
+
+      <div class="sec-nav"><button class="nav-btn" onclick="goTo(8)">← Anterior</button><button class="nav-btn nav-btn-next" onclick="goTo(10)">Siguiente: Presentación comercial →</button></div>
+    </section>
+
+    <!-- SEC 10 -->
+    <section class="sec" id="sec-10">
+      <div class="sec-eyebrow">Paso 10 · Herramientas</div>
+      <h1>Presentación comercial</h1>
+      <p class="sec-lead">Es la presentación que el Closer usa en la sesión de evaluación. No la presentas tú, pero conocerla te ayuda a conversar mejor: sabes exactamente a qué está entrando el lead y puedes anticipar dudas al agendar.</p>
+
+      <div class="card card-accent">
+        <h3>Qué es</h3>
+        <p>El recorrido completo de Líderes del Fitness: diagnóstico del negocio del gimnasio, método, resultados de otros dueños y los dos programas (Accelerator y Mastermind) con su inversión.</p>
+      </div>
+
+      <div class="card">
+        <h3>Cuándo te sirve</h3>
+        <ul>
+          <li>Para responder con seguridad si un lead pregunta "¿y qué es exactamente la sesión?" en el chat.</li>
+          <li>Para conocer el tono y los ejemplos que usa el Closer, y usar ese mismo lenguaje en la conversación.</li>
+          <li>Para revisarla junto con tu manager en tu primera semana.</li>
+        </ul>
+      </div>
+
+      <a class="btn-link" href="https://mirkotrain.github.io/Presentaci-n-Lideres-del-Fitness/" target="_blank" rel="noopener">↗ Ver la presentación comercial</a>
+
+      <div class="card" style="margin-top:1.2rem;">
+        <h3>Portal del cliente</h3>
+        <p>Es el producto que recibe el cliente en cuanto paga: su acceso a la formación online de Líderes del Fitness (los cursos del programa, en la misma plataforma tanto para Accelerator como para Mastermind).</p>
+        <a class="btn-link alt" href="https://curso.lideresdelfitness.com" target="_blank" rel="noopener">↗ Portal del cliente — curso.lideresdelfitness.com</a>
+        <div class="note" style="margin-top:.6rem;">Útil para que sepas exactamente qué está comprando el lead que agendas, y puedas explicárselo con seguridad si te pregunta "¿y qué recibo si me apunto?".</div>
+      </div>
+
+      <div class="card" style="margin-top:1.2rem;">
+        <h3>Proceso de onboarding del cliente</h3>
+        <p>Así es el recorrido que hace el cliente justo después de pagar. No es algo que tú gestiones, pero te sirve para responder con seguridad si un lead pregunta "¿y qué pasa después?":</p>
+        <ul>
+          <li><b>1. Diagnóstico (30%)</b> — rellena un formulario para evaluar la situación de su negocio y sus prioridades de crecimiento.</li>
+          <li><b>2. Acceso a la comunidad (50%)</b> — al enviar el formulario, se activa su acceso a la comunidad de WhatsApp (en menos de 24h).</li>
+          <li><b>3. Sesión 1 a 1 (70%)</b> — agenda su sesión personalizada con el equipo de consultoría a través de HubSpot.</li>
+          <li><b>4. Programa online (100%)</b> — acceso completo al currículo online, con calendario para reservar las sesiones en directo.</li>
+        </ul>
+        <a class="btn-link alt" href="https://lideresdelfitness.com/onboarding" target="_blank" rel="noopener">↗ Ver proceso de onboarding del cliente</a>
+      </div>
+
+      <div class="sec-nav"><button class="nav-btn" onclick="goTo(9)">← Anterior</button><button class="nav-btn nav-btn-next" onclick="goTo(11)">Siguiente: Formación con agente IA →</button></div>
+    </section>
+
+    <!-- SEC 11 -->
+    <section class="sec" id="sec-11">
+      <div class="sec-eyebrow">Paso 11 · Herramientas</div>
+      <h1>Formación de venta con agente IA</h1>
+      <p class="sec-lead">Un agente formador con IA, adaptado específicamente al rol de Setter: te entrena en abrir conversación, cualificar rápido y agendar — no en discovery ni cierre, que es el terreno del Closer.</p>
+
+      <div class="card card-accent">
+        <h3>Qué es</h3>
+        <p>Una herramienta interna de práctica con IA donde puedes simular conversaciones reales de mensajería (redes y WhatsApp), recibir feedback sobre tus aperturas y tu cualificación rápida, y repasar cómo manejar objeciones al agendar y la secuencia para asegurar el show-up.</p>
+      </div>
+
+      <div class="card">
+        <h3>Cuándo usarla</h3>
+        <ul>
+          <li>Desde el primer día, en paralelo al resto del onboarding.</li>
+          <li>Antes de llevar tus primeras conversaciones reales en solitario.</li>
+          <li>Cuando quieras repasar una objeción o un tramo de la conversación que no te esté saliendo bien.</li>
+        </ul>
+      </div>
+
+      <a class="btn-link" href="https://platform.trainingym.com/formacion/formacion-prueba" target="_blank" rel="noopener">↗ Entrar al agente formador</a>
+      <div class="note"><b>Nota:</b> accedes con tus credenciales de empresa. Si no tienes acceso, pídeselo a tu manager en tu primer día.</div>
+
+      <div class="sec-nav"><button class="nav-btn" onclick="goTo(10)">← Anterior</button><button class="nav-btn nav-btn-next" onclick="goTo(12)">Siguiente: GoHighLevel →</button></div>
+    </section>
+
+    <!-- SEC 12 -->
+    <section class="sec" id="sec-12">
+      <div class="sec-eyebrow">Paso 12 · Herramientas</div>
+      <h1>GoHighLevel (GHL)</h1>
+      <p class="sec-lead">GoHighLevel es el CRM/funnel todo-en-uno que usamos para gestionar leads, pipeline, agenda y automatizaciones de seguimiento. Es también donde llegan tus mensajes de Instagram, Facebook y WhatsApp de empresa.</p>
+
+      <div class="tabs-wrap">
+        <div class="tabs">
+          <button class="tab-btn on" onclick="showSub('ghl-nav',this)">Navegación básica</button>
+          <button class="tab-btn" onclick="showSub('ghl-tareas',this)">Tus tareas diarias</button>
+          <button class="tab-btn" onclick="showSub('ghl-buenas',this)">Buenas prácticas</button>
+          <button class="tab-btn" onclick="showSub('ghl-cursos',this)">Cursos</button>
+        </div>
+        <div class="tab-pane on" id="ghl-nav">
+          <div class="card"><ul>
+            <li><b>Bandeja de leads / Contactos:</b> donde entran los leads nuevos, ya sea por redes, WhatsApp o formulario web.</li>
+            <li><b>Oportunidades / Pipeline:</b> fases del lead hasta la sesión (nuevo → contactado → cualificado → sesión agendada → traspasado al Closer).</li>
+            <li><b>Calendario:</b> disponibilidad de los Closers para agendar sesiones de evaluación.</li>
+            <li><b>Conversaciones:</b> bandeja unificada de Instagram, Facebook, WhatsApp/SMS y email con cada lead — tu bandeja principal del día a día.</li>
+          </ul></div>
+        </div>
+        <div class="tab-pane" id="ghl-tareas">
+          <div class="card"><ul>
+            <li>Revisa la bandeja de Conversaciones (Instagram, Facebook y WhatsApp) apenas empieces la jornada, priorizando los mensajes más recientes.</li>
+            <li>Responde y registra cada contacto en menos de 5 minutos si es posible.</li>
+            <li>Anota en la ficha del contacto las respuestas de la cualificación rápida (Interés/Urgencia/Decisor).</li>
+            <li>Al agendar, mueve la oportunidad a "sesión agendada" y verifica que el recordatorio automático esté activo.</li>
+            <li>Completa el traspaso (paso 9) en la misma ficha antes de cerrar el día.</li>
+          </ul></div>
+        </div>
+        <div class="tab-pane" id="ghl-buenas">
+          <div class="card"><ul>
+            <li>Ningún mensaje nuevo debería quedar sin respuesta más de unas horas.</li>
+            <li>Notas claras y cortas — el Closer las lee en segundos antes de la llamada.</li>
+            <li>Si un lead no responde tras varios intentos, regístralo como "en seguimiento" en vez de dejarlo huérfano en el pipeline.</li>
+          </ul></div>
+        </div>
+        <div class="tab-pane" id="ghl-cursos">
+          <div class="card">
+            <h3>Gratis · para el día a día</h3>
+            <p><b>HighLevel University</b> — más de 60 cursos oficiales gratuitos. Empieza por "Master HighLevel For Beginners".</p>
+            <a class="btn-link alt" href="https://hluniversity.gohighlevel.com/communities/groups/official-highlevel-community/learning" target="_blank" rel="noopener">↗ Abrir HighLevel University</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="note"><b>Nota:</b> los nombres exactos de las fases del pipeline y los campos personalizados pueden variar según cómo esté configurado GHL en tu equipo — confírmalos con tu manager en tu primera semana y ajusta esta ficha si hace falta.</div>
+
+      <div class="sec-nav"><button class="nav-btn" onclick="goTo(11)">← Anterior</button><button class="nav-btn nav-btn-next" onclick="goTo(13)">Siguiente: HubSpot →</button></div>
+    </section>
+
+    <!-- SEC 13 -->
+    <section class="sec" id="sec-13">
+      <div class="sec-eyebrow">Paso 13 · Herramientas</div>
+      <h1>HubSpot</h1>
+      <p class="sec-lead">HubSpot se usa en paralelo a GoHighLevel dentro del mismo proceso: mismo lead, mismo pipeline conceptual, registrado también aquí para reporting y trazabilidad del equipo.</p>
+
+      <div class="tabs-wrap">
+        <div class="tabs">
+          <button class="tab-btn on" onclick="showSub('hs-nav',this)">Navegación básica</button>
+          <button class="tab-btn" onclick="showSub('hs-tareas',this)">Tus tareas diarias</button>
+          <button class="tab-btn" onclick="showSub('hs-buenas',this)">Buenas prácticas</button>
+          <button class="tab-btn" onclick="showSub('hs-cursos',this)">Cursos y certificación</button>
+        </div>
+        <div class="tab-pane on" id="hs-nav">
+          <div class="card"><ul>
+            <li><b>Contactos y empresas:</b> ficha del gimnasio y de la persona de contacto.</li>
+            <li><b>Negocios (Deals):</b> equivalente a las oportunidades de GHL, con su propio pipeline y fases.</li>
+            <li><b>Tareas:</b> tus recordatorios de seguimiento, visibles también para tu manager.</li>
+            <li><b>Informes:</b> paneles de nº de leads contactados, tasa de cualificación y sesiones agendadas.</li>
+          </ul></div>
+        </div>
+        <div class="tab-pane" id="hs-tareas">
+          <div class="card"><ul>
+            <li>Duplica en HubSpot el resultado clave de cada contacto (cualificado / no cualificado / sesión agendada).</li>
+            <li>Marca como completadas las tareas del día a medida que las resuelvas.</li>
+            <li>Revisa semanalmente tu propio informe de actividad: leads contactados, tasa de respuesta, sesiones agendadas.</li>
+          </ul></div>
+        </div>
+        <div class="tab-pane" id="hs-buenas">
+          <div class="card"><ul>
+            <li>Evita duplicar contactos: busca antes de crear uno nuevo.</li>
+            <li>Mantén la fase del negocio siempre actualizada — es la que usa el Closer y el reporting del equipo.</li>
+            <li>Si un dato difiere entre GHL y HubSpot, avisa a tu manager para corregirlo, no elijas uno "a ojo".</li>
+          </ul></div>
+        </div>
+        <div class="tab-pane" id="hs-cursos">
+          <div class="card">
+            <h3>Gratis · para empezar</h3>
+            <p><b>Set Up Your HubSpot CRM For Growth</b> — curso oficial de HubSpot Academy para dominar la navegación básica del CRM.</p>
+            <a class="btn-link alt" href="https://academy.hubspot.com/courses/set-up-your-hubspot-crm-for-growth" target="_blank" rel="noopener">↗ Abrir curso de CRM</a>
+          </div>
+          <div class="card">
+            <h3>Certificación oficial recomendada</h3>
+            <p><b>HubSpot Sales Hub Software Certification</b> — 4 lecciones (prospección, gestión de acuerdos, reportes) + examen de 60 preguntas. Certificación oficial de HubSpot Academy.</p>
+            <a class="btn-link alt" href="https://academy.hubspot.com/courses/hubspot-sales-hub-software" target="_blank" rel="noopener">↗ Abrir certificación Sales Hub</a>
+            <p style="margin-top:.5rem;">Catálogo completo de cursos gratuitos: <a href="https://academy.hubspot.com/courses" target="_blank" rel="noopener">academy.hubspot.com/courses</a></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="note"><b>Nota:</b> la configuración exacta de pipelines y propiedades en HubSpot puede variar — tu manager te confirmará el detalle en la formación práctica de tu primera semana.</div>
+
+      <div class="sec-nav"><button class="nav-btn" onclick="goTo(12)">← Anterior</button><button class="nav-btn nav-btn-next" onclick="goTo(14)">Siguiente: Checklist →</button></div>
+    </section>
+
+    <!-- SEC 14 -->
+    <section class="sec" id="sec-14">
+      <div class="sec-eyebrow">Paso 14 · Arranque</div>
+      <h1>Checklist de tu primera semana</h1>
+      <p class="sec-lead">Pulsa cada punto a medida que lo completes (el progreso no se guarda al recargar la página — úsalo como guía en tu jornada).</p>
+
+      <div class="card">
+        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-txt">Leer esta guía completa de principio a fin.</div></div>
+        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-txt">Ver la presentación comercial (paso 10) para saber a qué está entrando el lead cuando agenda.</div></div>
+        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-txt">Acceso creado y probado en GoHighLevel y en HubSpot, incluida la bandeja de Conversaciones (redes y WhatsApp).</div></div>
+        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-txt">Completar el curso gratuito básico de HighLevel University y el curso "Set Up Your HubSpot CRM".</div></div>
+        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-txt">Probar el agente formador con IA (paso 11) y hacer al menos una simulación de conversación.</div></div>
+        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-txt">Leer (en sombra) conversaciones reales de redes y WhatsApp de un setter senior.</div></div>
+        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-txt">Repasar el paso 7 (objeciones al agendar) hasta poder responderlas sin mirar la guía.</div></div>
+        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-txt">Repasar el paso 8 (secuencia de show-up) y aplicarla desde tu primera sesión agendada.</div></div>
+        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-txt">Contestar tus primeros mensajes reales acompañado/a, con feedback posterior.</div></div>
+        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-txt">Revisar con tu manager tus métricas: tiempo de respuesta, tasa de cualificación, show-up rate.</div></div>
+      </div>
+
+      <div class="card">
+        <h3>Recursos</h3>
+        <a class="btn-link" href="https://lideresdelfitness.com/" target="_blank" rel="noopener">↗ Web de Líderes del Fitness</a>
+        <div class="note" style="margin-top:.8rem;">🚧 <b>A completar por tu manager:</b> enlace al calendario del equipo y contacto de WhatsApp para dudas del día a día.</div>
+      </div>
+
+      <div class="card">
+        <h3>Glosario rápido</h3>
+        <p><span class="term" onclick="openModal('cualificacion')">Cualificación rápida</span> · <span class="term" onclick="openModal('sesion')">Sesión de evaluación</span> · <span class="term" onclick="openModal('showup')">Show-up</span> · <span class="term" onclick="openModal('crm')">GHL / HubSpot</span></p>
+      </div>
+
+      <div class="sec-nav"><button class="nav-btn" onclick="goTo(13)">← Anterior</button><span></span></div>
+    </section>
+
+  </main>
+</div>
+
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box" id="modal-cualificacion"><button class="modal-close" onclick="closeModal()">✕</button><h3>Cualificación rápida</h3><p>Filtro de 3-5 minutos que hace el Setter, dentro de la propia conversación de chat, antes de agendar: Interés, Urgencia, Decisor y encaje básico (negocio ya en marcha). No sustituye el discovery completo del Closer, solo confirma que vale la pena la sesión.</p></div>
+  <div class="modal-box" id="modal-sesion"><button class="modal-close" onclick="closeModal()">✕</button><h3>Sesión de evaluación</h3><p>Llamada de venta de 45-60 minutos que agenda el Setter y lleva el Closer, donde se hace el discovery completo, se presenta el programa y se busca el cierre o un siguiente paso concreto.</p></div>
+  <div class="modal-box" id="modal-showup"><button class="modal-close" onclick="closeModal()">✕</button><h3>Show-up</h3><p>Que el lead se presente realmente a la sesión de evaluación que agendaste. Se consigue con una secuencia de recordatorios y confirmaciones, no solo agendando el hueco. Ver <b>paso 8</b>.</p></div>
+  <div class="modal-box" id="modal-crm"><button class="modal-close" onclick="closeModal()">✕</button><h3>GoHighLevel / HubSpot</h3><p>Las dos plataformas de gestión de leads y pipeline que usa el equipo, en paralelo, para el mismo proceso comercial. GoHighLevel es además donde llegan tus mensajes de Instagram, Facebook y WhatsApp. Ver pasos 12 y 13 para el detalle de uso diario.</p></div>
+</div>
+
+<script>
+  const TOTAL_STEPS = 14;
+  function goTo(n){
+    document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+    document.getElementById('sec-'+n).classList.add('on');
+    document.querySelectorAll('.step-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('[data-step="'+n+'"], [data-step-m="'+n+'"]').forEach(b=>b.classList.add('active'));
+    const pct = Math.round((n/TOTAL_STEPS)*100);
+    document.getElementById('progress-fill-d').style.width = pct+'%';
+    document.getElementById('progress-label-d').textContent = 'Paso '+n+' de '+TOTAL_STEPS;
+    document.getElementById('progress-label-m').textContent = 'Paso '+n+' de '+TOTAL_STEPS;
+    closeDrawer();
+    window.scrollTo(0,0);
+  }
+  function showSub(id, btn){
+    const wrap = btn.closest('.tabs-wrap');
+    wrap.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+    wrap.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('on'));
+    wrap.querySelector('#'+id).classList.add('on');
+  }
+  function openModal(id){
+    document.getElementById('modal-overlay').classList.add('on');
+    document.querySelectorAll('.modal-box').forEach(m=>m.style.display='none');
+    document.getElementById('modal-'+id).style.display='block';
+  }
+  function closeModal(){ document.getElementById('modal-overlay').classList.remove('on'); }
+  function toggleDrawer(){ document.getElementById('drawer').classList.toggle('on'); document.getElementById('drawer-backdrop').classList.toggle('on'); }
+  function closeDrawer(){ document.getElementById('drawer').classList.remove('on'); document.getElementById('drawer-backdrop').classList.remove('on'); }
+  function toggleCheck(el){ el.classList.toggle('done'); }
+</script>
+</body>
+</html>
